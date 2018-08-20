@@ -354,7 +354,7 @@ export class LineCommentCommand implements editorCommon.ICommand {
 
 			res.push(EditOperation.delete(new Range(
 				startLineNumber + i, lineData.commentStrOffset + 1,
-				startLineNumber + i, lineData.commentStrOffset + lineData.commentStrLength + 1
+				startLineNumber + i, lineData.commentStrOffset + /*С.Л.*/((lineData.commentStr.indexOf("//") !== -1) ? 2 : ((lineData.commentStr.indexOf("#") !== -1) ? 1 : lineData.commentStrLength)) + 1 /*Д.Р. VSCode компилируется с target=es5, в котором отсутствует string.includes*/
 			)));
 		}
 
@@ -374,7 +374,7 @@ export class LineCommentCommand implements editorCommon.ICommand {
 				continue;
 			}
 
-			res.push(EditOperation.insert(new Position(startLineNumber + i, lineData.commentStrOffset + 1), lineData.commentStr + ' '));
+			res.push(EditOperation.insert(new Position(startLineNumber + i, lineData.commentStrOffset + 1), lineData.commentStr/*С.Л. + " "*/));
 		}
 
 		return res;
