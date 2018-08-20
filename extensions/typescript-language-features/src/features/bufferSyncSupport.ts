@@ -225,6 +225,15 @@ class SyncedBuffer {
 		this.state = BufferState.Closed;
 	}
 
+	/*С.Г.*/
+	public save() {
+		const args: Proto.CompileOnSaveEmitFileRequestArgs = {
+			file: this.filepath,
+			forced: true /*Д.Р. file should be recompiled even if it does not have any changes*/
+		};
+		this.client.executeWithoutWaitingForResponse('compileOnSaveEmitFile', args);
+	}
+
 	public onContentChanged(events: readonly vscode.TextDocumentContentChangeEvent[]): void {
 		if (this.state !== BufferState.Open) {
 			console.error(`Unexpected buffer state: ${this.state}`);
@@ -348,6 +357,7 @@ export default class BufferSyncSupport extends Disposable {
 		vscode.workspace.onDidOpenTextDocument(this.openTextDocument, this, this._disposables);
 		vscode.workspace.onDidCloseTextDocument(this.onDidCloseTextDocument, this, this._disposables);
 		vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument, this, this._disposables);
+		vscode.workspace.onDidSaveTextDocument(this.onDidSaveTextDocument, this, this._disposables); /*С.Л.*/
 		vscode.workspace.textDocuments.forEach(this.openTextDocument, this);
 	}
 
@@ -436,6 +446,23 @@ export default class BufferSyncSupport extends Disposable {
 			this.pendingGetErr = undefined;
 			this.triggerDiagnostics();
 		}
+	}
+	/*С.Л.*/
+	onDidSaveTextDocument(document: vscode.TextDocument) {
+		//let filepath = this.client.normalizePath(document.uri);
+		//if (!filepath) {
+		//	return;
+		//}
+		//let syncedBuffer = this.syncedBuffers.get(filepath);
+		const resource = document.uri;
+		const syncedBuffer = this.syncedBuffers.get(resource);
+		if (!syncedBuffer) {
+			return;
+		}
+		/*С.Г.*/
+		//if (this.client.apiVersion.has206Features()) {
+		syncedBuffer.save();
+		//}
 	}
 
 	public requestAllDiagnostics() {

@@ -62,6 +62,7 @@ interface StandardTsServerRequests {
 interface NoResponseTsServerRequests {
 	'open': [Proto.OpenRequestArgs, null];
 	'close': [Proto.FileRequestArgs];
+	'compileOnSaveEmitFile': [Proto.CompileOnSaveEmitFileRequestArgs];
 	'change': [Proto.ChangeRequestArgs, null];
 	'updateOpen': [Proto.UpdateOpenRequestArgs, null];
 	'compilerOptionsForInferredProjects': [Proto.SetCompilerOptionsForInferredProjectsArgs, null];
